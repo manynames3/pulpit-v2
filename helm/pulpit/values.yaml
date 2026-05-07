@@ -1,0 +1,13 @@
+tenant: bethel-atlanta
+
+apiService:
+  image: placeholder
+  tag: latest
+
+queryService:
+  image: placeholder
+  tag: latest
+
+ingestService:
+  image: placeholder
+  tag: latest

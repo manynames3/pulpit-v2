@@ -1,1 +1,5 @@
-tenant: bethel-atlanta
+global:
+  tenant: bethel-atlanta
+  tenantDisplayName: Atlanta Bethel Church
+  primaryLocale: ko
+  secondaryLocale: en

@@ -1,0 +1,19 @@
+{{- if .Values.apiService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pulpit.fullname" . }}-api
+  labels:
+    {{- include "pulpit.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api-service
+spec:
+  type: {{ .Values.apiService.service.type }}
+  selector:
+    {{- include "pulpit.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: api-service
+  ports:
+    - name: http
+      port: {{ .Values.apiService.service.port }}
+      targetPort: {{ .Values.apiService.service.targetPort }}
+      protocol: TCP
+{{- end }}

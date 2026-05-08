@@ -1,0 +1,19 @@
+{{- if .Values.queryService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pulpit.fullname" . }}-query
+  labels:
+    {{- include "pulpit.labels" . | nindent 4 }}
+    app.kubernetes.io/component: query-service
+spec:
+  type: {{ .Values.queryService.service.type }}
+  selector:
+    {{- include "pulpit.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: query-service
+  ports:
+    - name: http
+      port: {{ .Values.queryService.service.port }}
+      targetPort: {{ .Values.queryService.service.targetPort }}
+      protocol: TCP
+{{- end }}

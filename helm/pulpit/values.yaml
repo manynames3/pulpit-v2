@@ -1,13 +1,74 @@
-tenant: bethel-atlanta
+global:
+  tenant: bethel-atlanta
+  tenantDisplayName: Atlanta Bethel Church
+  primaryLocale: ko
+  secondaryLocale: en
+  imagePullSecrets: []
+  podAnnotations: {}
+  commonEnv: {}
+  metrics:
+    scrapeAnnotations: true
+  serviceAccount:
+    create: true
+    name: ""
+    annotations: {}
 
 apiService:
-  image: placeholder
-  tag: latest
+  enabled: true
+  replicaCount: 1
+  image:
+    registry: 636305658578.dkr.ecr.us-east-1.amazonaws.com
+    repository: pulpit-v2-dev/api-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  containerPort: 8000
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+  resources: {}
+  env: {}
+  command: []
+  args: []
 
 queryService:
-  image: placeholder
-  tag: latest
+  enabled: true
+  replicaCount: 1
+  image:
+    registry: 636305658578.dkr.ecr.us-east-1.amazonaws.com
+    repository: pulpit-v2-dev/query-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  containerPort: 8000
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+  resources: {}
+  env: {}
+  command: []
+  args: []
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
 
 ingestService:
-  image: placeholder
-  tag: latest
+  enabled: true
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  backoffLimit: 1
+  restartPolicy: OnFailure
+  image:
+    registry: 636305658578.dkr.ecr.us-east-1.amazonaws.com
+    repository: pulpit-v2-dev/ingest-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  command: []
+  args: []
+  resources: {}
+  env: {}

@@ -1,1 +1,6 @@
-Pulpit V2 Helm chart scaffold.
+Pulpit V2 chart deployed for tenant: {{ .Values.global.tenant }}
+
+Rendered workloads:
+- {{ include "pulpit.fullname" . }}-api
+- {{ include "pulpit.fullname" . }}-query
+- {{ include "pulpit.fullname" . }}-ingest

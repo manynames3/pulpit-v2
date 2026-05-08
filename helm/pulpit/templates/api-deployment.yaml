@@ -1,0 +1,79 @@
+{{- if .Values.apiService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pulpit.fullname" . }}-api
+  labels:
+    {{- include "pulpit.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api-service
+spec:
+  replicas: {{ .Values.apiService.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "pulpit.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api-service
+  template:
+    metadata:
+      labels:
+        {{- include "pulpit.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: api-service
+      {{- if or .Values.global.metrics.scrapeAnnotations .Values.global.podAnnotations }}
+      annotations:
+        {{- if .Values.global.metrics.scrapeAnnotations }}
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: {{ .Values.apiService.containerPort | quote }}
+        {{- end }}
+        {{- with .Values.global.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "pulpit.serviceAccountName" . }}
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: api-service
+          image: {{ include "pulpit.image" .Values.apiService.image }}
+          imagePullPolicy: {{ .Values.apiService.image.pullPolicy }}
+          {{- with .Values.apiService.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.apiService.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.apiService.containerPort }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "pulpit.fullname" . }}-tenant-config
+          env:
+            - name: PULPIT_SERVICE_NAME
+              value: api-service
+            {{- range $key, $value := .Values.global.commonEnv }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- range $key, $value := .Values.apiService.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          {{- with .Values.apiService.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

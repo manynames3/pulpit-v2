@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "pulpit.fullname" . }}-tenant-config
+  labels:
+    {{- include "pulpit.labels" . | nindent 4 }}
+data:
+  PULPIT_TENANT: {{ .Values.global.tenant | quote }}
+  PULPIT_TENANT_DISPLAY_NAME: {{ .Values.global.tenantDisplayName | quote }}
+  PULPIT_PRIMARY_LOCALE: {{ .Values.global.primaryLocale | quote }}
+  PULPIT_SECONDARY_LOCALE: {{ .Values.global.secondaryLocale | quote }}

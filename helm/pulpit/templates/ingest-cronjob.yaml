@@ -1,0 +1,75 @@
+{{- if .Values.ingestService.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "pulpit.fullname" . }}-ingest
+  labels:
+    {{- include "pulpit.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ingest-service
+spec:
+  schedule: {{ .Values.ingestService.schedule | quote }}
+  concurrencyPolicy: {{ .Values.ingestService.concurrencyPolicy }}
+  startingDeadlineSeconds: {{ .Values.ingestService.startingDeadlineSeconds }}
+  successfulJobsHistoryLimit: {{ .Values.ingestService.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.ingestService.failedJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      backoffLimit: {{ .Values.ingestService.backoffLimit }}
+      template:
+        metadata:
+          labels:
+            {{- include "pulpit.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: ingest-service
+          {{- if or .Values.global.metrics.scrapeAnnotations .Values.global.podAnnotations }}
+          annotations:
+            {{- if .Values.global.metrics.scrapeAnnotations }}
+            prometheus.io/scrape: "true"
+            prometheus.io/path: /metrics
+            prometheus.io/port: "8000"
+            {{- end }}
+            {{- with .Values.global.podAnnotations }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
+        spec:
+          serviceAccountName: {{ include "pulpit.serviceAccountName" . }}
+          restartPolicy: {{ .Values.ingestService.restartPolicy }}
+          {{- with .Values.global.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: ingest-service
+              image: {{ include "pulpit.image" .Values.ingestService.image }}
+              imagePullPolicy: {{ .Values.ingestService.image.pullPolicy }}
+              {{- with .Values.ingestService.command }}
+              command:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              {{- with .Values.ingestService.args }}
+              args:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              envFrom:
+                - configMapRef:
+                    name: {{ include "pulpit.fullname" . }}-tenant-config
+              env:
+                - name: PULPIT_SERVICE_NAME
+                  value: ingest-service
+                {{- range $key, $value := .Values.global.commonEnv }}
+                - name: {{ $key }}
+                  value: {{ $value | quote }}
+                {{- end }}
+                {{- range $key, $value := .Values.ingestService.env }}
+                - name: {{ $key }}
+                  value: {{ $value | quote }}
+                {{- end }}
+              ports:
+                - name: metrics
+                  containerPort: 8000
+                  protocol: TCP
+              {{- with .Values.ingestService.resources }}
+              resources:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+{{- end }}

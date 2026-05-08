@@ -1,0 +1,79 @@
+{{- if .Values.queryService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pulpit.fullname" . }}-query
+  labels:
+    {{- include "pulpit.labels" . | nindent 4 }}
+    app.kubernetes.io/component: query-service
+spec:
+  replicas: {{ .Values.queryService.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "pulpit.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: query-service
+  template:
+    metadata:
+      labels:
+        {{- include "pulpit.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: query-service
+      {{- if or .Values.global.metrics.scrapeAnnotations .Values.global.podAnnotations }}
+      annotations:
+        {{- if .Values.global.metrics.scrapeAnnotations }}
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: {{ .Values.queryService.containerPort | quote }}
+        {{- end }}
+        {{- with .Values.global.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "pulpit.serviceAccountName" . }}
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: query-service
+          image: {{ include "pulpit.image" .Values.queryService.image }}
+          imagePullPolicy: {{ .Values.queryService.image.pullPolicy }}
+          {{- with .Values.queryService.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.queryService.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.queryService.containerPort }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "pulpit.fullname" . }}-tenant-config
+          env:
+            - name: PULPIT_SERVICE_NAME
+              value: query-service
+            {{- range $key, $value := .Values.global.commonEnv }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- range $key, $value := .Values.queryService.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          {{- with .Values.queryService.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

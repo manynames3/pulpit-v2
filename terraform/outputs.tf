@@ -42,3 +42,13 @@ output "github_actions_role_arn" {
   description = "Optional GitHub Actions role ARN."
   value       = module.iam.github_actions_role_arn
 }
+
+output "github_actions_oidc_provider_arn" {
+  description = "Optional GitHub Actions OIDC provider ARN."
+  value       = module.iam.github_actions_oidc_provider_arn
+}
+
+output "github_actions_ecr_policy_arn" {
+  description = "Optional GitHub Actions ECR policy ARN."
+  value       = module.iam.github_actions_ecr_policy_arn
+}

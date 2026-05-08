@@ -51,6 +51,7 @@ module "iam" {
   create_github_actions_role = var.create_github_actions_role
   github_repository          = var.github_repository
   role_name                  = "${local.name_prefix}-github-actions"
+  ecr_repository_prefix      = local.name_prefix
   tags                       = local.common_tags
 }
 

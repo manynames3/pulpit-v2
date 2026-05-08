@@ -16,4 +16,5 @@ node_min_size       = 2
 node_max_size       = 2
 node_desired_size   = 2
 
-github_repository = "manynames3/pulpit-v2"
+github_repository          = "manynames3/pulpit-v2"
+create_github_actions_role = true

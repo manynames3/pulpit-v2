@@ -2,13 +2,23 @@ name: Build Images
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "services/**"
+      - ".github/workflows/build-push.yml"
   pull_request:
     paths:
       - "services/**"
       - ".github/workflows/build-push.yml"
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,5 +28,49 @@ jobs:
           - ingest-service
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r ./services/${{ matrix.service }}/requirements.txt pytest httpx
+      - name: Run tests for ${{ matrix.service }}
+        env:
+          PYTHONPATH: ./services/${{ matrix.service }}
+        run: pytest ./services/${{ matrix.service }}/tests -q
       - name: Build ${{ matrix.service }}
         run: docker build -t pulpit-v2/${{ matrix.service }}:local ./services/${{ matrix.service }}
+
+  publish-to-ecr:
+    if: github.event_name != 'pull_request' && vars.AWS_ROLE_TO_ASSUME != '' && vars.ENABLE_ECR_PUBLISH == 'true'
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - api-service
+          - query-service
+          - ingest-service
+    env:
+      AWS_REGION: us-east-1
+      ECR_REPOSITORY_PREFIX: pulpit-v2-dev
+    steps:
+      - uses: actions/checkout@v5
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push ${{ matrix.service }}
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY_PREFIX/${{ matrix.service }}"
+          docker build -t "$IMAGE_URI:$IMAGE_TAG" -t "$IMAGE_URI:latest" ./services/${{ matrix.service }}
+          docker push "$IMAGE_URI:$IMAGE_TAG"
+          docker push "$IMAGE_URI:latest"

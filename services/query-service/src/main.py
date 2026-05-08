@@ -1,9 +1,3 @@
-from fastapi import FastAPI
+from src.app import create_app
 
-app = FastAPI(title="pulpit-v2-query-service")
-
-
-@app.get("/healthz")
-def healthcheck() -> dict[str, str]:
-    return {"status": "ok", "service": "query-service"}
-
+app = create_app()

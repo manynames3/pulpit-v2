@@ -138,7 +138,7 @@ variable "ecr_force_delete" {
 variable "create_github_actions_role" {
   description = "Whether to create a GitHub Actions OIDC role scaffold."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "github_repository" {

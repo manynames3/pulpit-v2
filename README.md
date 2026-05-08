@@ -135,9 +135,11 @@ V1 is a deployable working product. V2 is a platform and DevOps portfolio projec
 This repo now includes:
 
 - V2 folder structure
+- Terraform Phase 1 scaffold for VPC, ECR, EKS, and optional GitHub OIDC role setup
 - starter FastAPI services with health endpoints
 - starter Dockerfiles
 - starter Helm chart
+- starter CI workflow for Terraform validation and container builds
 - V2 architecture and runbook docs
 - V1 code retained as migration reference
 
@@ -150,7 +152,8 @@ This repo now includes:
 ## Next Steps
 
 1. Build EKS Terraform in `terraform/`
-2. Turn the service stubs into deployable containers
-3. Add Helm templates and tenant values
-4. Install ArgoCD and observability stack
-5. Migrate V1 ingest and query logic into services
+2. Apply and verify the Phase 1 EKS stack
+3. Turn the service stubs into deployable containers
+4. Add Helm templates and tenant values
+5. Install ArgoCD and observability stack
+6. Migrate V1 ingest and query logic into services

@@ -13,6 +13,21 @@ global:
     name: ""
     annotations: {}
 
+ingress:
+  enabled: false
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+  hosts:
+    - host: pulpit-v2.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
 apiService:
   enabled: true
   replicaCount: 1
@@ -72,3 +87,20 @@ ingestService:
   args: []
   resources: {}
   env: {}
+  metricsService:
+    enabled: true
+    port: 8000
+    targetPort: 8000
+
+observability:
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+    labels:
+      release: kube-prometheus-stack
+  prometheusRule:
+    enabled: true
+    labels:
+      release: kube-prometheus-stack
+    queryServiceP95MsThreshold: 2000

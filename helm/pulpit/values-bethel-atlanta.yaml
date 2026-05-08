@@ -3,3 +3,11 @@ global:
   tenantDisplayName: Atlanta Bethel Church
   primaryLocale: ko
   secondaryLocale: en
+
+ingress:
+  enabled: true
+  hosts:
+    - host: bethel-atlanta.pulpit-v2.local
+      paths:
+        - path: /
+          pathType: Prefix

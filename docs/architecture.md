@@ -69,6 +69,7 @@ Shared platform namespaces:
 3. `query-service` performs retrieval against indexed sermon data.
 4. `query-service` calls Bedrock for answer generation.
 5. Metrics are exported for latency, request volume, and model usage.
+6. Prometheus scrapes service metrics through `ServiceMonitor` resources, and Grafana visualizes tenant-level behavior.
 
 ### Ingest path
 
@@ -83,9 +84,14 @@ Shared platform namespaces:
 - Use **EKS** because the portfolio goal is Kubernetes/DevOps credibility, not lowest cost.
 - Keep **tenant visibility** first-class in dashboards and metrics.
 - Treat **V1 code as migration reference**, not production dependency.
+- Model GitOps explicitly in-repo:
+  - raw namespace and quota manifests live under `manifests/`
+  - tenant workload releases live in the `helm/pulpit` chart
+  - ArgoCD child applications connect the two
 
 ## Constraints
 
 - EKS should be easy to destroy after demos to control cost.
 - Bedrock cost attribution must happen at the app layer, not by Kubernetes namespace alone.
 - Kubernetes features must map to real business reasoning, not resume padding.
+- The current observability assets are starter artifacts. Prometheus alerts and Grafana dashboards will need to be tightened as the services expose richer domain metrics.

@@ -1,0 +1,51 @@
+{{- if .Values.observability.prometheusRule.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "pulpit.fullname" . }}-alerts
+  labels:
+    {{- include "pulpit.labels" . | nindent 4 }}
+    {{- with .Values.observability.prometheusRule.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+    - name: {{ include "pulpit.fullname" . }}.availability
+      rules:
+        - alert: PulpitApiServiceDown
+          expr: up{namespace="{{ .Release.Namespace }}", service="{{ include "pulpit.fullname" . }}-api"} == 0
+          for: 10m
+          labels:
+            severity: warning
+            tenant: {{ .Values.global.tenant | quote }}
+          annotations:
+            summary: API service is not being scraped
+            description: Prometheus has not seen successful scrapes from the tenant API service for 10 minutes.
+        - alert: PulpitQueryServiceDown
+          expr: up{namespace="{{ .Release.Namespace }}", service="{{ include "pulpit.fullname" . }}-query"} == 0
+          for: 10m
+          labels:
+            severity: critical
+            tenant: {{ .Values.global.tenant | quote }}
+          annotations:
+            summary: Query service is not being scraped
+            description: Prometheus has not seen successful scrapes from the tenant query service for 10 minutes.
+        - alert: PulpitQueryLatencyP95High
+          expr: histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{service="query-service",namespace="{{ .Release.Namespace }}"}[5m]))) * 1000 > {{ .Values.observability.prometheusRule.queryServiceP95MsThreshold }}
+          for: 10m
+          labels:
+            severity: warning
+            tenant: {{ .Values.global.tenant | quote }}
+          annotations:
+            summary: Query latency p95 exceeded target
+            description: Query latency p95 is above {{ .Values.observability.prometheusRule.queryServiceP95MsThreshold }}ms for 10 minutes.
+        - alert: PulpitIngestJobFailures
+          expr: increase(kube_job_status_failed{namespace="{{ .Release.Namespace }}", job_name=~"{{ include "pulpit.fullname" . }}-ingest.*"}[1h]) > 0
+          for: 5m
+          labels:
+            severity: warning
+            tenant: {{ .Values.global.tenant | quote }}
+          annotations:
+            summary: Ingest CronJob has failed recently
+            description: At least one ingest job failed in the last hour.
+{{- end }}

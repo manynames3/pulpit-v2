@@ -1,0 +1,13 @@
+global:
+  tenant: demo-church
+  tenantDisplayName: Demo Church
+  primaryLocale: en
+  secondaryLocale: ko
+
+ingress:
+  enabled: true
+  hosts:
+    - host: demo.pulpit-v2.local
+      paths:
+        - path: /
+          pathType: Prefix

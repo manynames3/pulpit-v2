@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-church
+  labels:
+    app.kubernetes.io/part-of: pulpit-v2
+    pulpit.ai/tenant: demo-church
+    pulpit.ai/display-name: Demo Church

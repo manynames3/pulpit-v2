@@ -1,0 +1,19 @@
+{{- if and .Values.ingestService.enabled .Values.ingestService.metricsService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pulpit.fullname" . }}-ingest-metrics
+  labels:
+    {{- include "pulpit.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ingest-service
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "pulpit.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: ingest-service
+  ports:
+    - name: metrics
+      port: {{ .Values.ingestService.metricsService.port }}
+      targetPort: {{ .Values.ingestService.metricsService.targetPort }}
+      protocol: TCP
+{{- end }}

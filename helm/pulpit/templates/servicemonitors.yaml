@@ -1,0 +1,66 @@
+{{- if .Values.observability.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "pulpit.fullname" . }}-api
+  labels:
+    {{- include "pulpit.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api-service
+    {{- with .Values.observability.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "pulpit.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api-service
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: {{ .Values.observability.serviceMonitor.interval }}
+      scrapeTimeout: {{ .Values.observability.serviceMonitor.scrapeTimeout }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "pulpit.fullname" . }}-query
+  labels:
+    {{- include "pulpit.labels" . | nindent 4 }}
+    app.kubernetes.io/component: query-service
+    {{- with .Values.observability.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "pulpit.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: query-service
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: {{ .Values.observability.serviceMonitor.interval }}
+      scrapeTimeout: {{ .Values.observability.serviceMonitor.scrapeTimeout }}
+{{- if and .Values.ingestService.enabled .Values.ingestService.metricsService.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "pulpit.fullname" . }}-ingest
+  labels:
+    {{- include "pulpit.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ingest-service
+    {{- with .Values.observability.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "pulpit.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: ingest-service
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: {{ .Values.observability.serviceMonitor.interval }}
+      scrapeTimeout: {{ .Values.observability.serviceMonitor.scrapeTimeout }}
+{{- end }}
+{{- end }}

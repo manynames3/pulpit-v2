@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-church
+  namespace: argocd
+spec:
+  project: pulpit-v2
+  source:
+    repoURL: https://github.com/manynames3/pulpit-v2.git
+    targetRevision: main
+    path: helm/pulpit
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-demo-church.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: demo-church
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

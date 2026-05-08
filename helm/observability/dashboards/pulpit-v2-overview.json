@@ -1,0 +1,71 @@
+{
+  "title": "Pulpit V2 Overview",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "tags": ["pulpit-v2", "tenant"],
+  "templating": {
+    "list": [
+      {
+        "name": "namespace",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(kube_namespace_labels{label_pulpit_ai_tenant!=\"\"}, namespace)",
+        "refresh": 1,
+        "includeAll": false,
+        "multi": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Query Request Rate",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{namespace=\"$namespace\",service=\"query-service\"}[5m]))",
+          "legendFormat": "query-service"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Query Latency P95 (ms)",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{namespace=\"$namespace\",service=\"query-service\"}[5m]))) * 1000",
+          "legendFormat": "p95"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Ingest Jobs Completed",
+      "targets": [
+        {
+          "expr": "sum(increase(kube_job_status_succeeded{namespace=\"$namespace\",job_name=~\".*ingest.*\"}[24h]))",
+          "legendFormat": "completed"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Estimated Bedrock Tokens (5m)",
+      "targets": [
+        {
+          "expr": "sum(increase(bedrock_tokens_total{namespace=\"$namespace\"}[5m]))",
+          "legendFormat": "tokens"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+    }
+  ]
+}

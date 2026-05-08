@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: pulpit-v2
+  namespace: argocd
+spec:
+  description: Pulpit V2 tenant workloads and foundational manifests
+  sourceRepos:
+    - https://github.com/manynames3/pulpit-v2.git
+  destinations:
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+    - namespace: bethel-atlanta
+      server: https://kubernetes.default.svc
+    - namespace: demo-church
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"

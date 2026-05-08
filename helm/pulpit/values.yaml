@@ -12,6 +12,9 @@ global:
     create: true
     name: ""
     annotations: {}
+  irsa:
+    enabled: false
+    roleArn: ""
 
 ingress:
   enabled: false
@@ -91,6 +94,18 @@ ingestService:
     enabled: true
     port: 8000
     targetPort: 8000
+
+externalSecrets:
+  enabled: false
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: aws-parameter-store
+  target:
+    creationPolicy: Owner
+    deletionPolicy: Retain
+  data: []
+  dataFrom: []
 
 observability:
   serviceMonitor:

@@ -60,6 +60,12 @@ Shared platform namespaces:
 - `external-secrets`
 - `ingress-system`
 
+Runtime secret shape:
+
+- tenant apps use Kubernetes `ServiceAccount` annotations for IRSA
+- runtime configuration is synchronized from AWS SSM or Secrets Manager through `ExternalSecret` resources
+- app pods consume the resulting Kubernetes Secret as environment variables
+
 ## Runtime Model
 
 ### Query path
@@ -95,3 +101,4 @@ Shared platform namespaces:
 - Bedrock cost attribution must happen at the app layer, not by Kubernetes namespace alone.
 - Kubernetes features must map to real business reasoning, not resume padding.
 - The current observability assets are starter artifacts. Prometheus alerts and Grafana dashboards will need to be tightened as the services expose richer domain metrics.
+- External Secrets and IRSA are scaffolded at the chart layer, but the backing AWS roles, parameter paths, and secret-store installation still need to be created in-cluster.

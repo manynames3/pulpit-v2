@@ -3,6 +3,9 @@ global:
   tenantDisplayName: Atlanta Bethel Church
   primaryLocale: ko
   secondaryLocale: en
+  irsa:
+    enabled: true
+    roleArn: arn:aws:iam::636305658578:role/pulpit-v2-dev-bethel-atlanta-workload
 
 ingress:
   enabled: true
@@ -11,3 +14,22 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
+
+externalSecrets:
+  enabled: true
+  data:
+    - secretKey: AWS_REGION
+      remoteRef:
+        key: /pulpit-v2/shared/aws-region
+    - secretKey: BEDROCK_MODEL_ID
+      remoteRef:
+        key: /pulpit-v2/bethel-atlanta/bedrock/model-id
+    - secretKey: COGNITO_USER_POOL_ID
+      remoteRef:
+        key: /pulpit-v2/bethel-atlanta/cognito/user-pool-id
+    - secretKey: COGNITO_APP_CLIENT_ID
+      remoteRef:
+        key: /pulpit-v2/bethel-atlanta/cognito/app-client-id
+    - secretKey: SERMON_INDEX_BUCKET
+      remoteRef:
+        key: /pulpit-v2/bethel-atlanta/s3/index-bucket

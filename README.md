@@ -144,6 +144,8 @@ This repo now includes:
   - ALB-style ingress
   - HPA for `query-service`
   - `ServiceMonitor` and `PrometheusRule` starters
+  - IRSA-ready service account annotations
+  - `ExternalSecret` support for tenant-scoped runtime configuration
 - tenant manifests for:
   - `bethel-atlanta`
   - `demo-church`
@@ -161,8 +163,8 @@ This repo now includes:
 
 ## Next Steps
 
-1. Add External Secrets and IRSA-specific service-account annotations to the Helm chart
-2. Apply and verify the Phase 1 EKS stack
-3. Install ArgoCD and kube-prometheus-stack into the cluster
+1. Apply and verify the Phase 1 EKS stack
+2. Install ArgoCD, External Secrets Operator, and kube-prometheus-stack into the cluster
+3. Create tenant IRSA roles and SSM parameter paths
 4. Validate the tenant apps and dashboard wiring end to end
 5. Migrate V1 ingest and query logic into services

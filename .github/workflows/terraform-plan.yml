@@ -1,0 +1,71 @@
+name: Terraform Plan
+
+on:
+  workflow_dispatch:
+
+env:
+  TF_VERSION: "1.7.0"
+  AWS_REGION: "us-east-1"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  plan:
+    name: Terraform Plan (dev)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check AWS plan configuration
+        id: config
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          ready=true
+
+          if [ -z "$AWS_ACCESS_KEY_ID" ]; then
+            echo "::notice::Skipping Terraform plan because AWS_ACCESS_KEY_ID is not configured."
+            ready=false
+          fi
+
+          if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+            echo "::notice::Skipping Terraform plan because AWS_SECRET_ACCESS_KEY is not configured."
+            ready=false
+          fi
+
+          echo "ready=$ready" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        if: steps.config.outputs.ready == 'true'
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        if: steps.config.outputs.ready == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup Terraform
+        if: steps.config.outputs.ready == 'true'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Configure AWS Credentials
+        if: steps.config.outputs.ready == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        if: steps.config.outputs.ready == 'true'
+        run: terraform init -input=false
+
+      - name: Build Lambda Packages
+        if: steps.config.outputs.ready == 'true'
+        run: ./scripts/build-lambda.sh
+
+      - name: Terraform Plan
+        if: steps.config.outputs.ready == 'true'
+        run: terraform plan -no-color -input=false -var-file=environments/dev/terraform.tfvars

@@ -5,4 +5,6 @@ metadata:
   labels:
     app.kubernetes.io/part-of: pulpit-v2
     pulpit.ai/tenant: bethel-atlanta
+    pulpit.ai/display-name: atlanta-bethel-church
+  annotations:
     pulpit.ai/display-name: Atlanta Bethel Church

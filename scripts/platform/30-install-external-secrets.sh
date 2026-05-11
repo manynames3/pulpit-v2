@@ -81,7 +81,7 @@ helm "${HELM_ARGS[@]}"
 
 log "Applying ClusterSecretStore for AWS Parameter Store"
 cat <<EOF | kubectl apply -f -
-apiVersion: external-secrets.io/v1beta1
+apiVersion: external-secrets.io/v1
 kind: ClusterSecretStore
 metadata:
   name: aws-parameter-store

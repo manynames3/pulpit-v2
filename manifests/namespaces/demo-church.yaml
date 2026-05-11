@@ -5,4 +5,6 @@ metadata:
   labels:
     app.kubernetes.io/part-of: pulpit-v2
     pulpit.ai/tenant: demo-church
+    pulpit.ai/display-name: demo-church
+  annotations:
     pulpit.ai/display-name: Demo Church

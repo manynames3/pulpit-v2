@@ -3,6 +3,9 @@ global:
   tenantDisplayName: Atlanta Bethel Church
   primaryLocale: ko
   secondaryLocale: en
+  bridge:
+    queryApiUrl: https://6nlf91miid.execute-api.us-east-1.amazonaws.com/dev/query
+    catalogApiUrl: https://6nlf91miid.execute-api.us-east-1.amazonaws.com/dev/catalog
   imagePullSecrets: []
   podAnnotations: {}
   commonEnv: {}
@@ -38,7 +41,7 @@ apiService:
     registry: 636305658578.dkr.ecr.us-east-1.amazonaws.com
     repository: pulpit-v2-dev/api-service
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   containerPort: 8000
   service:
     type: ClusterIP
@@ -56,7 +59,7 @@ queryService:
     registry: 636305658578.dkr.ecr.us-east-1.amazonaws.com
     repository: pulpit-v2-dev/query-service
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   containerPort: 8000
   service:
     type: ClusterIP
@@ -85,7 +88,7 @@ ingestService:
     registry: 636305658578.dkr.ecr.us-east-1.amazonaws.com
     repository: pulpit-v2-dev/ingest-service
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   command: []
   args: []
   resources: {}

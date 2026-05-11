@@ -10,7 +10,7 @@ global:
 ingress:
   enabled: true
   hosts:
-    - host: bethel-atlanta.pulpit-v2.local
+    - host: ""
       paths:
         - path: /
           pathType: Prefix

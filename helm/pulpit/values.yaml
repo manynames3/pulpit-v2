@@ -102,6 +102,7 @@ externalSecrets:
     kind: ClusterSecretStore
     name: aws-parameter-store
   target:
+    name: ""
     creationPolicy: Owner
     deletionPolicy: Retain
   data: []

@@ -74,7 +74,7 @@ pulpit-v2/
 ├── frontend-alternative/       # V1 reference code (seed material)
 ├── lambda/                     # V1 reference code (seed material)
 ├── modules/                    # V1 Terraform modules (seed material)
-└── scripts/                    # V1 ingest/indexing scripts (seed material)
+└── scripts/                    # Platform bootstrap helpers + V1 ingest/indexing reference
 ```
 
 ## Build Phases
@@ -160,6 +160,7 @@ This repo now includes:
 - [Architecture](docs/architecture.md)
 - [Runbook](docs/runbook.md)
 - [V1 migration notes](docs/v1-reference.md)
+- [Platform bootstrap scripts](scripts/platform/README.md)
 
 ## Next Steps
 

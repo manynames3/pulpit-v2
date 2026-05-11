@@ -25,7 +25,7 @@
       "title": "Query Request Rate",
       "targets": [
         {
-          "expr": "sum(rate(http_requests_total{namespace=\"$namespace\",service=\"query-service\"}[5m]))",
+          "expr": "sum(rate(pulpit_query_requests_total{namespace=\"$namespace\"}[5m]))",
           "legendFormat": "query-service"
         }
       ],
@@ -37,7 +37,7 @@
       "title": "Query Latency P95 (ms)",
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{namespace=\"$namespace\",service=\"query-service\"}[5m]))) * 1000",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(pulpit_query_request_latency_seconds_bucket{namespace=\"$namespace\"}[5m]))) * 1000",
           "legendFormat": "p95"
         }
       ],
@@ -58,11 +58,11 @@
     {
       "id": 4,
       "type": "stat",
-      "title": "Estimated Bedrock Tokens (5m)",
+      "title": "Scrape Targets Up",
       "targets": [
         {
-          "expr": "sum(increase(bedrock_tokens_total{namespace=\"$namespace\"}[5m]))",
-          "legendFormat": "tokens"
+          "expr": "sum(up{namespace=\"$namespace\",service=~\".*(api|query|ingest).*\"})",
+          "legendFormat": "targets"
         }
       ],
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}

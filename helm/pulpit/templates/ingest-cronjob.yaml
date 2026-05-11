@@ -53,6 +53,10 @@ spec:
               envFrom:
                 - configMapRef:
                     name: {{ include "pulpit.fullname" . }}-tenant-config
+                {{- if .Values.externalSecrets.enabled }}
+                - secretRef:
+                    name: {{ include "pulpit.externalSecretName" . }}
+                {{- end }}
               env:
                 - name: PULPIT_SERVICE_NAME
                   value: ingest-service

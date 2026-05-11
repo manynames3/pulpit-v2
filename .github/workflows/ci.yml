@@ -1,54 +1,110 @@
-name: Pulpit CI
+name: Pulpit Platform CI
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
   pull_request:
-    branches: [main]
+    branches:
+      - main
+    paths:
+      - ".github/workflows/ci.yml"
+      - "terraform/**"
+      - "helm/**"
+      - "manifests/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/ci.yml"
+      - "terraform/**"
+      - "helm/**"
+      - "manifests/**"
+
+permissions:
+  contents: read
 
 env:
   TF_VERSION: "1.7.0"
-  AWS_REGION:  "us-east-1"
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-
-  # ─────────────────────────────────────────
-  # JOB 1 — Validate (no AWS creds needed)
-  # ─────────────────────────────────────────
-  validate:
-    name: Validate
+  validate-terraform:
+    name: Validate Terraform
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
-      - name: Build Lambda Packages
-        run: ./scripts/build-lambda.sh
+      - name: Terraform format check
+        run: terraform fmt -check -recursive terraform
 
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
+      - name: Terraform init
+        run: terraform -chdir=terraform init -backend=false -input=false
 
-      - name: Terraform Validate
-        run: |
-          terraform init -backend=false -input=false
-          terraform validate
+      - name: Terraform validate
+        run: terraform -chdir=terraform validate
 
-      - name: Checkov Security Scan
+      - name: Checkov security scan
         uses: bridgecrewio/checkov-action@v12
         with:
-          directory: .
+          directory: terraform
           framework: terraform
-          soft_fail: true
+          soft_fail: false
           output_format: cli
+
+  validate-kubernetes-assets:
+    name: Validate Kubernetes Assets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install manifest validation dependencies
+        run: python -m pip install --upgrade pip pyyaml
+
+      - name: Helm lint for bethel-atlanta
+        run: helm lint ./helm/pulpit --values ./helm/pulpit/values-bethel-atlanta.yaml
+
+      - name: Helm lint for demo-church
+        run: helm lint ./helm/pulpit --values ./helm/pulpit/values-demo-church.yaml
+
+      - name: Helm render for bethel-atlanta
+        run: |
+          helm template bethel-atlanta ./helm/pulpit \
+            --namespace bethel-atlanta \
+            --values ./helm/pulpit/values-bethel-atlanta.yaml \
+            > /tmp/bethel-atlanta-rendered.yaml
+
+      - name: Helm render for demo-church
+        run: |
+          helm template demo-church ./helm/pulpit \
+            --namespace demo-church \
+            --values ./helm/pulpit/values-demo-church.yaml \
+            > /tmp/demo-church-rendered.yaml
+
+      - name: Validate static YAML manifests
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          yaml_paths = sorted(Path("manifests").rglob("*.yaml"))
+          if not yaml_paths:
+              raise SystemExit("No YAML manifests found under manifests/")
+
+          for path in yaml_paths:
+              with path.open("r", encoding="utf-8") as handle:
+                  list(yaml.safe_load_all(handle))
+          print(f"Validated {len(yaml_paths)} static manifest files.")
+          PY

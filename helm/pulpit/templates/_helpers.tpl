@@ -44,3 +44,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "pulpit.image" -}}
 {{- printf "%s/%s:%s" .registry .repository .tag -}}
 {{- end -}}
+
+{{- define "pulpit.externalSecretName" -}}
+{{- default (printf "%s-app-secrets" (include "pulpit.fullname" .)) .Values.externalSecrets.target.name -}}
+{{- end -}}

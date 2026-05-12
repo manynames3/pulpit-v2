@@ -13,6 +13,19 @@ These scripts turn the V2 repo into a repeatable demo-day deployment sequence af
 
 `scripts/platform/90-bootstrap-demo-platform.sh` runs the same sequence end to end.
 
+## Teardown
+
+Do not destroy the Terraform stack immediately after the cluster is still serving tenant `Ingress` objects.
+
+The safe order is:
+
+1. delete ingress-driven resources first
+2. wait for the AWS Load Balancer Controller to delete its ALBs and target groups
+3. verify the VPC no longer has ALB-owned ENIs or security groups
+4. run `terraform destroy`
+
+The full teardown procedure is documented in [`../../docs/runbook.md`](../../docs/runbook.md).
+
 ## Assumptions
 
 - `terraform apply` for the V2 cluster has already completed.

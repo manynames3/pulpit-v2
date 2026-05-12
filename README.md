@@ -3,7 +3,7 @@
 
 Pulpit V2 is the containerized, multi-tenant evolution of [Pulpit V1](https://github.com/manynames3/pulpit). V1 proved the product and low-cost serverless architecture. V2 exists to demonstrate Kubernetes, EKS, Terraform, Helm, ArgoCD, Prometheus, Grafana, OIDC, IRSA, and service decomposition in a real domain instead of a generic demo app.
 
-**Status:** initial starter repository seeded from the V1 codebase and V2 architecture plan
+**Status:** prototype V2 platform repo with a completed live deployment evidence capture from May 11, 2026
 
 ## Goal
 
@@ -158,9 +158,12 @@ This repo now includes:
 ## Documentation
 
 - [Architecture](docs/architecture.md)
+- [Deployment evidence](docs/deployment-evidence.md)
 - [Runbook](docs/runbook.md)
 - [V1 migration notes](docs/v1-reference.md)
 - [Platform bootstrap scripts](scripts/platform/README.md)
+
+The runbook now includes the staged teardown order needed for short-lived demo clusters that use the AWS Load Balancer Controller.
 
 ## Next Steps
 

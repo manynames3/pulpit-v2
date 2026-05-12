@@ -1,6 +1,6 @@
-# Deployment Evidence
+# Deployment Walkthrough
 
-This page documents a live demo deployment of Pulpit V2 on May 11, 2026. The environment was intentionally short-lived for cost control and was used to prove the current platform layers end to end:
+This page documents a live demo deployment of Pulpit V2 on May 11, 2026. The environment was intentionally short-lived for cost control and was used to capture the current platform layers end to end:
 
 - Amazon EKS control plane
 - managed node group on `t3.medium`
@@ -12,7 +12,7 @@ This page documents a live demo deployment of Pulpit V2 on May 11, 2026. The env
 
 The screenshots below are a curated subset of the full capture set under [`docs/screenshots/v2`](screenshots/v2).
 
-## What this deployment proved
+## What this deployment covered
 
 - a real EKS cluster was created and became healthy
 - tenant namespaces and workloads were deployed through ArgoCD
@@ -113,8 +113,8 @@ Additional observability captures:
 ## Notes on current limitations
 
 - The browser-facing app was real and live, but the query/answer path still used a V2-to-V1 bridge rather than a fully migrated V2 retrieval implementation.
-- The custom `Pulpit V2 Overview` Grafana dashboard did not have useful data during this session, so the evidence page uses the working Kubernetes and Prometheus dashboards instead.
-- This page intentionally prefers screenshots that prove working infrastructure and runtime state over early auth-flow troubleshooting or empty dashboards.
+- The custom `Pulpit V2 Overview` Grafana dashboard did not have useful data during this session, so this page uses the working Kubernetes and Prometheus dashboards instead.
+- This page intentionally prefers screenshots that show working infrastructure and runtime state over early auth-flow troubleshooting or empty dashboards.
 
 ## Teardown lesson learned
 

@@ -3,7 +3,27 @@
 
 Pulpit V2 is the containerized, multi-tenant evolution of [Pulpit V1](https://github.com/manynames3/pulpit). V1 proved the product and low-cost serverless architecture. V2 exists to demonstrate Kubernetes, EKS, Terraform, Helm, ArgoCD, Prometheus, Grafana, OIDC, IRSA, and service decomposition in a real domain instead of a generic demo app.
 
-**Status:** prototype V2 platform repo with a completed live deployment evidence capture from May 11, 2026
+- **Status:** prototype V2 platform repo with a completed live deployment capture from May 11, 2026
+- **Live frontend:** [pulpit-v2.pages.dev](https://pulpit-v2.pages.dev)
+- **Latest live deployment:** May 11, 2026
+- **Live deployment walkthrough:** [docs/deployment-walkthrough.md](docs/deployment-walkthrough.md)
+
+## What Was Deployed
+
+This repo includes a completed live deployment capture of:
+
+- Amazon EKS with a 2-node managed node group
+- ArgoCD app-of-apps managing shared namespaces plus `bethel-atlanta` and `demo-church`
+- internet-facing ALBs created from Kubernetes `Ingress`
+- External Secrets backed by AWS Systems Manager Parameter Store
+- Prometheus and Grafana scraping cluster components and tenant services
+- a Cloudflare Pages frontend returning cited sermon search results through the V2 API edge
+
+<p align="center">
+  <img src="docs/screenshots/v2/frontend/query-results-flood.png" alt="Pulpit V2 frontend returning cited sermon search results" width="32%" />
+  <img src="docs/screenshots/v2/argocd/argocd-applications-overview.png" alt="ArgoCD applications overview for the V2 platform" width="32%" />
+  <img src="docs/screenshots/v2/aws/eks-node-group-details.png" alt="Amazon EKS managed node group details" width="32%" />
+</p>
 
 ## Goal
 
@@ -158,7 +178,7 @@ This repo now includes:
 ## Documentation
 
 - [Architecture](docs/architecture.md)
-- [Deployment evidence](docs/deployment-evidence.md)
+- [Live deployment walkthrough](docs/deployment-walkthrough.md)
 - [Runbook](docs/runbook.md)
 - [V1 migration notes](docs/v1-reference.md)
 - [Platform bootstrap scripts](scripts/platform/README.md)

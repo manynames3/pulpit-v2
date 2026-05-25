@@ -1,0 +1,48 @@
+[
+  {
+    "id": "ko-pride-natural-language",
+    "category": "korean-natural-language-query",
+    "question": "최근에 목사님이 자만에 대한 설교를 했나요",
+    "subqueries": ["자만", "교만", "pride"],
+    "expected_terms": ["자만", "교만", "오만"],
+    "requires_source_snippets": true,
+    "notes": "V1 proved that full Korean sentences should reduce to compact sermon concepts and related Korean terms."
+  },
+  {
+    "id": "en-cloud-column-crosswalk",
+    "category": "english-to-korean-concept-query",
+    "question": "cloud column",
+    "subqueries": ["cloud column", "구름기둥", "pillar of cloud"],
+    "expected_terms": ["구름기둥"],
+    "requires_source_snippets": true,
+    "notes": "English Bible/church concepts must map to Korean archive language."
+  },
+  {
+    "id": "en-money-crosswalk",
+    "category": "english-to-korean-topic-query",
+    "question": "money",
+    "subqueries": ["money", "돈", "재물", "물질"],
+    "expected_terms": ["돈", "재물", "물질"],
+    "requires_source_snippets": true,
+    "notes": "English topic queries must not fail only because the archive phrase is Korean."
+  },
+  {
+    "id": "ko-archaeology-morphology",
+    "category": "korean-morphology-case",
+    "question": "고고학",
+    "subqueries": ["고고학", "고고학자", "발굴", "유물", "유적"],
+    "expected_terms": ["고고학", "고고학자", "발굴", "유물", "유적"],
+    "requires_source_snippets": true,
+    "notes": "V2 should preserve V1's Korean related-form matching instead of exact-string-only behavior."
+  },
+  {
+    "id": "en-death-source-card",
+    "category": "source-snippet-source-card-expectation",
+    "question": "death",
+    "subqueries": ["death", "죽음", "사망"],
+    "expected_terms": ["death", "죽음", "사망"],
+    "requires_source_snippets": true,
+    "requires_source_cards": true,
+    "notes": "Results must include enough source metadata for the frontend to show cited, watchable sermon cards."
+  }
+]
